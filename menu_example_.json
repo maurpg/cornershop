@@ -1,0 +1,25 @@
+{
+  "menus":[
+      {
+        "name":"bandeja paisa",
+         "date_menu":"2021-07-29",
+         "ingredient":[
+               "start",
+               "param_id"]
+           },{
+          "name": "chicharrones",
+         "date_menu":"2021-07-29",
+         "ingredient":[
+               "se",
+               "erer"]
+           },{
+          "name": "sopa",
+         "date_menu":"2021-07-29",
+         "ingredient":[
+               "frijol",
+               "verduras"]
+           }
+         
+     ]
+}
+       
