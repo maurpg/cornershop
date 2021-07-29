@@ -6,7 +6,7 @@ from nora.viewset import MenuList, UpdateMenu, CreateMenuSelectedUser, CreateIng
 
 urlpatterns = [path('api/get_token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
                path('api/get_token_refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
-               path('', UploadMenuView.as_view(), name='index'),
+               path('', UploadMenuView.as_view(), name='upload_menu'),
                path('api/menu_list', MenuList.as_view({'get': 'list'}), name='menu_list'),
                path('api/menu_list/<int:pk>', MenuList.as_view({'get': 'retrieve'}), name='menu_detail'),
                path('api/menu_list_user_selected', MenuUserList.as_view({'get': 'list'}), name='menu_select_user'),

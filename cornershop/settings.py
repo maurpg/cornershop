@@ -78,6 +78,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
+BASE_URL = 'http://127.0.0.1:8000'
 
 
 # Database
