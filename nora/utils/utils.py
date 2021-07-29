@@ -27,6 +27,11 @@ def send_email(user, menu, path):
 
 
 def assign_menu(token):
+    """
+    Function for filter token , if token exist return information about
+    menu, user and flag response with True Value and create instance of model
+    MenuUser, this model save information about select menus of user for one date
+    """
     try:
         user_token_object = UserToken.objects.get(token_user=token)
     except UserToken.DoesNotExist:
