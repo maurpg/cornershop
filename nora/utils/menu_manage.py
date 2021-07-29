@@ -17,6 +17,8 @@ class MenuAction:
         menu: date_menu, name_menu and ingredient , first create a new menu object
         after
         """
+        if Menu.objects.filter(name=menu_data.get('name'),date_menu=menu_data.get('date_menu')):
+            return None
         menu_new = Menu.objects.create(name=menu_data.get('name'), date_menu=menu_data.get('date_menu'))
         for ingredient in menu_data.get('ingredient'):
             ingredient_new = Ingredient.objects.create(name=ingredient)

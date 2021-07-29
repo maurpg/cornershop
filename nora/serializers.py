@@ -34,7 +34,7 @@ class MenuSerializer(serializers.ModelSerializer):
 class SerializerSelectUserMenu(serializers.ModelSerializer):
     class Meta:
         model = MenuUser
-        fields = ('user', 'menu')
+        fields = ('id', 'user', 'menu')
 
     def validate(self, data):
         """

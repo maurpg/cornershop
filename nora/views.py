@@ -18,14 +18,13 @@ class UploadMenuView(APIView):
         Execute Workflow ,we need user_id and pin for create instance and execute all function
         """
         try:
+            url = request.get_full_path()
             bytes_file = request.data.get('filename').read()
             data = json.loads(bytes_file.decode("UTF-8"))
             menu_information = list(data.values())[0]
             menu_actions = MenuAction(menu_information)
-            #menu_actions.save_menu()
-            #print(menu_actions.filter_by_date('2021-07-10', '2021-07-11'))
-            print(menu_actions.filter_by_ingredient(['start']))
-            send_reminder_menu.delay()
+            menu_actions.save_menu()
+            send_reminder_menu.delay(request.get_host())
         except UnicodeDecodeError:
             print("Could not open file:")
         return Response({'Processing data': []})

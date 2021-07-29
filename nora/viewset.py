@@ -2,15 +2,19 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.generics import UpdateAPIView, DestroyAPIView, CreateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser
-
 from nora.choices import nora
 from nora.models import Menu, MenuUser, Ingredient
+from nora.permissions import EmployeePermission, NoraPermission
 from nora.serializers import MenuSerializer, SerializerSelectUserMenu, IngredientSerializer, CreateUserSerializer
 import json
+
+from nora.tasks import send_reminder_menu
 from nora.utils.menu_manage import MenuAction
+from nora.utils.utils import assign_menu
 
 
 class MenuList(viewsets.ModelViewSet):
@@ -19,6 +23,7 @@ class MenuList(viewsets.ModelViewSet):
     with list function and detail specific menu with retrieve function, serializer
     class is instance
     """
+    #permission_classes = (IsAuthenticated, EmployeePermission, NoraPermission)
     queryset = Menu.objects.all()
     serializer_class = MenuSerializer
 
@@ -38,6 +43,7 @@ class MenuUserList(viewsets.ModelViewSet):
     with list function and detail specific menu with retrieve function, serializer
     class is instance
     """
+    #permission_classes = (IsAuthenticated, EmployeePermission, NoraPermission)
     queryset = MenuUser.objects.all()
     serializer_class = SerializerSelectUserMenu
 
@@ -67,6 +73,7 @@ class CreateMenu(CreateAPIView):
     all the parameters such as name, ingredients and
     date are expected
     """
+    #permission_classes = (IsAuthenticated, NoraPermission)
     serializer_class = MenuSerializer
     queryset = Menu.objects.all()
 
@@ -77,6 +84,7 @@ class UpdateMenu(UpdateAPIView):
     that on the indicated date there is no other menu with
     the same nam
     """
+    #permission_classes = (IsAuthenticated, NoraPermission)
     serializer_class = MenuSerializer
     queryset = Menu.objects.all()
 
@@ -86,6 +94,7 @@ class DestroyMenu(DestroyAPIView):
     Class for destroy or remove specific menu , receive one
     <pk:id> of menu selected for destroy
     """
+    #permission_classes = (IsAuthenticated, NoraPermission)
     serializer_class = MenuSerializer
     queryset = Menu.objects.all()
 
@@ -96,6 +105,7 @@ class CreateMenuSelectedUser(CreateAPIView):
     on a certain date for example the user mauricio chose the
     tray for July 27, 2021
     """
+    #permission_classes = (IsAuthenticated, NoraPermission, EmployeePermission)
     serializer_class = SerializerSelectUserMenu
     queryset = MenuUser
 
@@ -104,6 +114,7 @@ class CreateIngredient(CreateAPIView):
     """
     Class for create instance of Ingredient Model
     """
+    #permission_classes = (IsAuthenticated, NoraPermission)
     serializer_class = IngredientSerializer
     model = Ingredient
 
@@ -114,6 +125,7 @@ class CreateUserView(CreateAPIView):
     is create once the user is created, this is done by means of a signal,
     the relationship between user and profile is one to one
     """
+    #permission_classes = (IsAuthenticated, NoraPermission)
     model = User
     serializer_class = CreateUserSerializer
 
@@ -123,22 +135,36 @@ class UploadMenuView(APIView):
     Class for get json file with information about Menu
     """
     parser_classes = (MultiPartParser, )
+    #permission_classes = (IsAuthenticated, NoraPermission)
 
     def post(self, request):
         """
         Method for get json file and process data , here create instance of Class
-        Menu ,we need json with menu list, ingredient information, and menu date
-        information
+        Execute Workflow ,we need user_id and pin for create instance and execute all function
         """
         try:
+            url = request.get_full_path()
             bytes_file = request.data.get('filename').read()
             data = json.loads(bytes_file.decode("UTF-8"))
             menu_information = list(data.values())[0]
             menu_actions = MenuAction(menu_information)
-            #menu_actions.save_menu()
-            #print(menu_actions.filter_by_date('2021-07-10', '2021-07-11'))
-            print(menu_actions.filter_by_ingredient(['start']))
-            #send_reminder_menu.delay()
+            menu_actions.save_menu()
+            send_reminder_menu.delay(request.get_host())
         except UnicodeDecodeError:
             print("Could not open file:")
         return Response({'Processing data': []})
+
+
+class ConfirmMenu(APIView):
+    """
+    Class for confirm menu via email , receive a token and filter in model
+    UserToken if token in model , save menu user select information of instance
+    model and destroy token
+    """
+    def get(self, request):
+        token = request.GET['token']
+        create = assign_menu(token)
+        if create.get('response'):
+            menu = create.get('menu')
+            return Response({'Information': f'Menu {menu.menu.name} for {menu.date} was assigned'}, status=200)
+        return Response({'error': 'some errors'}, status=400)

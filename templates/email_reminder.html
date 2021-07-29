@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Email Menu Reminder</title>
-    {% for menu in menus %}
+
         <p>Name: {{ menu.name }}</p>
         <p>Date menu: {{ menu.date_menu }}</p>
         <p>Ingredient: <br/>{% for name in menu.ingredient.all %}{{ name }}<br/>{% endfor %}</p>
-    {% endfor %}
+        <p>Link for confirm: </p> <a href="{{ host }}/api/confirm_menu?token={{token}}">Ver</a>
 </head>
 <body>
 
