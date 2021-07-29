@@ -1,7 +1,7 @@
 # Cornershop Nora
 | key | value | 
 | --------     | --------  |
-| URL branch  |  https://gitlab.com/maurpg/cornershop/-/tree/master-28-jul |
+| URL branch  | https://github.com/maurpg/cornershop/tree/master_cornershop |
 | Requirements path   | cornershop/requirements.txt |
 | Settings path       | cornershop/settings.py |
 | Default Email From Error 500   | n/a |
