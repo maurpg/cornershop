@@ -28,7 +28,9 @@ http://{host}/api/menu_list and http://{host}/api/menu_list/{id} for retrieve
 6==> to get all the menus selected by the users http://{host}/api/menu_list_user_selected
 
 7==>Additionally, token authentication was implemented, in case it is required to protect any service
-   
+ 
+8 ==> créate user with profile http://{host}/api/create_user
+
 get_token ===>api/get_token/
 refresh_token ===>api/get_token_refresh/
 
